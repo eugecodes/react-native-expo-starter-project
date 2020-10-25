@@ -1,0 +1,2 @@
+INSERT INTO `person` (`Id`, `Last Name`, `First Name`, `Aliases`, `Movies As Actor Actress`, `Movies As Director`, `Movies As Producer`) VALUES (NULL, 'Testing1', 'Test', 'MiTest', 'Moovie1', 'Moovie2', 'Moovie3');
+
