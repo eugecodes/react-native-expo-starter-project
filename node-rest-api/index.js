@@ -67,7 +67,7 @@ app.get('/person', function (req, res) {
 });
 
 // Display all movies
-app.get('/movie', function (req, res) {
+app.get('/movies', function (req, res) {
   connection.query('SELECT * FROM movie', (error, result) => {
     if (error) throw error;
     res.send(result);
@@ -98,9 +98,17 @@ app.post('/person/new', auth, (req, res) => {
 });
 
 // Look for some movie in particular
-app.get('/movie/:movieName', function (req, res) {
+/*app.get('/movie/:movieName', function (req, res) {
   var look_for = req.params.movieName;
   connection.query("select * from movie where `Title` like '%" + look_for + "%'", function(err, rows, fields) {
+    if (err) throw err;
+    res.send(rows[0]);
+  });
+});
+*/
+app.get('/movie/:movieId', function (req, res) {
+  var look_for = req.params.movieId;
+  connection.query("select * from movie where `ID` = " + look_for + " ", function(err, rows, fields) {
     if (err) throw err;
     res.send(rows[0]);
   });
@@ -117,6 +125,37 @@ app.post('/movie/new', auth, (req, res) => {
     if (err) throw err;
     res.status(201).send(`Movie added with ID: ${rows.insertId}`);
   });
+});
+
+var jsonParser = bodyParser.json()
+app.post('/movie/delete', jsonParser, (req, res) => {	
+	var id = req.body.ID;
+	connection.query("DELETE FROM `movie` WHERE Id = "+id, function(err, rows, fields) {
+		if (err) throw err;
+		res.status(201).send(`Movie deleted, ID: ${id}`);
+	});
+
+});
+
+app.post('/movie/save', jsonParser, (req, res) => {	
+  var id =req.body.ID;
+  var title = req.body.Title;
+  var releaseYear = req.body.ReleaseYear;
+  var casting = req.body.Casting;
+  var directors = req.body.Directors;
+  var producers = req.body.Producers;
+  
+  if(id > 0){
+	connection.query("UPDATE movie SET `Title` = '"+title+"', `Release Year` = '"+releaseYear+"', `Casting` = '"+casting+"', `Directors` =  '"+directors+"', `Producers` = '"+producers+"' WHERE Id = "+id, function(err, rows, fields) {
+		if (err) throw err;
+		res.status(201).send(`Movie edited with ID: ${id}`);
+	});
+  }else{
+	  connection.query("insert into movie (`Title`, `Release Year`, `Casting`, `Directors`, `Producers`) values('"+title+"','"+releaseYear+"','"+casting+"','"+directors+"','"+producers+"')", function(err, rows, fields) {
+		if (err) throw err;
+		res.status(201).send(`${rows.insertId}`);
+	  });
+  }
 });
 
 // Add new user
